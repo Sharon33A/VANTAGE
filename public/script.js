@@ -10,6 +10,19 @@ function generateFuture() {
         name, situation, goal, challenge, extra
     }));
 
+    // Track story submission before navigating away
+    if (typeof pendo !== "undefined") {
+        pendo.track("story_submitted", {
+            has_name: !!name,
+            situation_length: situation.length,
+            goal_length: goal.length,
+            challenge_length: challenge.length,
+            extra_length: extra.length,
+            has_extra: !!extra,
+            fields_completed_count: [name, situation, goal, challenge, extra].filter(Boolean).length
+        });
+    }
+
     window.location.href = "future.html";
 }
 
@@ -25,6 +38,7 @@ async function loadFutureResults() {
     const userData = JSON.parse(data);
 
     let timeoutTriggered = false;
+    const generationStart = Date.now();
 
     const loadingMessages = [
         "Analyzing your life situation...",
@@ -44,6 +58,17 @@ async function loadFutureResults() {
     const timeout = setTimeout(() => {
         timeoutTriggered = true;
         clearInterval(loader);
+        // Track timeout failure
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_generation_failed", {
+                failure_reason: "timeout",
+                was_timeout: true,
+                time_elapsed_ms: Date.now() - generationStart,
+                situation_length: userData.situation ? userData.situation.length : 0,
+                goal_length: userData.goal ? userData.goal.length : 0,
+                challenge_length: userData.challenge ? userData.challenge.length : 0
+            });
+        }
         showFallbackData();
     }, 30000);
 
@@ -88,6 +113,23 @@ async function loadFutureResults() {
         setText("lifeGPS", extractSection(text, "LIFE_GPS:", "CONFLICT_DETECTOR:"));
         setText("conflictDetector", extractSection(text, "CONFLICT_DETECTOR:", "FUTURE_LETTER:"));
 
+        // Track successful future generation
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_generated", {
+                response_length: text.length,
+                has_future_a: text.includes("FUTURE_A:"),
+                has_future_b: text.includes("FUTURE_B:"),
+                has_future_c: text.includes("FUTURE_C:"),
+                has_life_gps: text.includes("LIFE_GPS:"),
+                has_conflict_detector: text.includes("CONFLICT_DETECTOR:"),
+                has_future_letter: text.includes("FUTURE_LETTER:"),
+                generation_duration_ms: Date.now() - generationStart,
+                situation_length: userData.situation ? userData.situation.length : 0,
+                goal_length: userData.goal ? userData.goal.length : 0,
+                challenge_length: userData.challenge ? userData.challenge.length : 0
+            });
+        }
+
         // MEMORY CARDS FIXED
         const memoryContainer = document.getElementById("memoryCards");
         if (memoryContainer) {
@@ -103,6 +145,18 @@ async function loadFutureResults() {
     } catch (err) {
         console.error(err);
         clearInterval(loader);
+        // Track API/parse failure
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_generation_failed", {
+                failure_reason: "api_error",
+                error_message: String(err.message || "").substring(0, 100),
+                was_timeout: false,
+                time_elapsed_ms: Date.now() - generationStart,
+                situation_length: userData.situation ? userData.situation.length : 0,
+                goal_length: userData.goal ? userData.goal.length : 0,
+                challenge_length: userData.challenge ? userData.challenge.length : 0
+            });
+        }
         showFallbackData();
     }
 }
@@ -174,6 +228,16 @@ function speakText(id) {
     speech.volume = 1;
 
     window.speechSynthesis.speak(speech);
+
+    // Track narration playback
+    if (typeof pendo !== "undefined") {
+        pendo.track("future_narration_played", {
+            section_id: id,
+            voice_choice: selected,
+            text_length: text.length,
+            page: window.location.pathname
+        });
+    }
 }
 
 function stopSpeech() {
@@ -242,6 +306,14 @@ if (window.location.pathname.includes("future-letter.html")) {
 
         if (!full) {
             el.innerText = "No letter found. Please generate first.";
+            // Track letter view with no content available
+            if (typeof pendo !== "undefined") {
+                pendo.track("future_letter_viewed", {
+                    letter_available: false,
+                    letter_length: 0,
+                    has_ai_response_stored: false
+                });
+            }
             return;
         }
 
@@ -251,5 +323,14 @@ if (window.location.pathname.includes("future-letter.html")) {
             : "Your future self believes in you.";
 
         el.innerText = letter;
+
+        // Track letter view with content
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_letter_viewed", {
+                letter_available: start !== -1,
+                letter_length: letter.length,
+                has_ai_response_stored: true
+            });
+        }
     });
 }

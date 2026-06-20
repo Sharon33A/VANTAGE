@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vantage | Future Letter</title>
+
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="future-container">
+
+    <div class="future-header">
+        <h1>Your Future Letter</h1>
+        <p>A message from your future self</p>
+    </div>
+
+    <div class="voice-selector">
+
+        <select id="voiceChoice">
+            <option value="female">Female Voice</option>
+            <option value="male">Male Voice</option>
+        </select>
+
+        <button class="voice-btn" onclick="stopSpeech()">Stop Voice</button>
+
+    </div>
+
+    <div class="future-card letter-card">
+
+        <h2>Future Self Message</h2>
+
+        <button class="voice-btn" onclick="speakText('futureLetterText')">
+            🔊 Listen
+        </button>
+
+        <div id="futureLetterText" style="margin-top:20px;"></div>
+
+        <div style="text-align:center;margin-top:30px;">
+            <button class="hero-button" onclick="window.location.href='future.html'">
+                Back
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

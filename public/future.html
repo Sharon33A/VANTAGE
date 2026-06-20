@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vantage | Your Futures</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="future-container">
+
+    <!-- HEADER -->
+    <div class="future-header">
+
+        <span class="premium-label">PERSONALIZED INSIGHTS</span>
+
+        <h1>Your Possible Futures</h1>
+
+        <p>
+            These are not predictions.
+            They are realistic possibilities based on your current choices, habits, and goals.
+        </p>
+
+    </div>
+
+    <!-- DEMO/JUDGE BANNER (SAFE PLACEHOLDER) -->
+    <div id="judgeBanner"></div>
+
+    <!-- VOICE CONTROLS -->
+    <div class="voice-selector">
+
+        <label for="voiceChoice">Choose Narrator</label>
+
+        <select id="voiceChoice">
+            <option value="female">Female Voice</option>
+            <option value="male">Male Voice</option>
+        </select>
+
+        <button class="voice-btn" onclick="stopSpeech()">
+            Stop Voice
+        </button>
+
+    </div>
+
+    <!-- LOADING -->
+    <div id="loadingBox" class="loading-card">
+        <h3>Analyzing Your Story...</h3>
+        <p>Exploring multiple paths and possibilities.</p>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="resultsContainer" style="display:none;">
+
+        <!-- FUTURE A -->
+        <div class="future-card future-a">
+            <div class="future-header-row">
+                <h2>Future A <span class="future-subtitle">The Inconsistent Path</span></h2>
+                <button onclick="speakText('futureA')" class="voice-btn">🔊 Listen</button>
+            </div>
+            <div id="futureA"></div>
+        </div>
+
+        <!-- FUTURE B -->
+        <div class="future-card future-b">
+            <div class="future-header-row">
+                <h2>Future B <span class="future-subtitle">The Growth Path</span></h2>
+                <button onclick="speakText('futureB')" class="voice-btn">🔊 Listen</button>
+            </div>
+            <div id="futureB"></div>
+        </div>
+
+        <!-- FUTURE C -->
+        <div class="future-card future-c">
+            <div class="future-header-row">
+                <h2>Future C <span class="future-subtitle">The Alternative Path</span></h2>
+                <button onclick="speakText('futureC')" class="voice-btn">🔊 Listen</button>
+            </div>
+            <div id="futureC"></div>
+        </div>
+
+        <!-- LIFE GPS -->
+        <div class="future-card">
+            <div class="future-header-row">
+                <h2>Life GPS</h2>
+                <button onclick="speakText('lifeGPS')" class="voice-btn">🔊 Listen</button>
+            </div>
+            <div id="lifeGPS"></div>
+        </div>
+
+        <!-- CONFLICT -->
+        <div class="future-card">
+            <h2>Conflict Detector</h2>
+            <div id="conflictDetector"></div>
+        </div>
+
+        <!-- LETTER -->
+        <div class="future-card letter-card">
+            <h2>Letter From Your Future Self</h2>
+
+            <p style="color:#d8ecf3;margin:15px 0;">
+                A message generated from your journey.
+            </p>
+
+            <div style="text-align:center;">
+                <button class="hero-button" onclick="goToLetter()">
+                    💌 Read Your Future Letter
+                </button>
+            </div>
+        </div>
+
+        <!-- MEMORY CARDS -->
+        <div class="future-card">
+
+            <h2>Future Memory Cards</h2>
+
+            <p style="color:#d8ecf3;margin-bottom:15px;">
+                Timeline of your possible transformation.
+            </p>
+
+            <div id="memoryCards" style="display:grid;gap:12px;"></div>
+
+        </div>
+
+        <!-- PRIVACY -->
+        <div class="future-card">
+
+            <h2>Your Story Stays Yours</h2>
+
+            <ul style="line-height:2;">
+                <li>Your responses remain private.</li>
+                <li>No data is sold or shared.</li>
+                <li>You control your journey.</li>
+                <li>You can reset anytime.</li>
+            </ul>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

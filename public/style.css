@@ -570,7 +570,9 @@ footer{
 
     margin-bottom:15px;
 
-    font-size:1.05rem;
+    font-size:1.2rem;
+
+    font-weight:600;
 
     color:#fff;
 }
@@ -593,7 +595,14 @@ footer{
 
     color:white;
 
-    font-size:15px;
+    font-size:20px;
+}
+.story-card input::placeholder,
+.story-card textarea::placeholder {
+
+    font-size:18px;
+
+    color:rgba(255,255,255,0.6);
 }
 
 .story-card textarea{

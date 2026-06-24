@@ -10,6 +10,17 @@ function generateFuture() {
         name, situation, goal, challenge, extra
     }));
 
+    if (typeof pendo !== "undefined") {
+        pendo.track("story_submitted", {
+            has_name: !!name,
+            situation_length: situation.length,
+            goal_length: goal.length,
+            challenge_length: challenge.length,
+            has_extra: !!extra,
+            fields_completed_count: [name, situation, goal, challenge, extra].filter(Boolean).length
+        });
+    }
+
     window.location.href = "future.html";
 }
 
@@ -25,6 +36,7 @@ async function loadFutureResults() {
     const userData = JSON.parse(data);
 
     let timeoutTriggered = false;
+    const generationStart = Date.now();
 
     const loadingMessages = [
         "Analyzing your life situation...",
@@ -44,6 +56,13 @@ async function loadFutureResults() {
     const timeout = setTimeout(() => {
         timeoutTriggered = true;
         clearInterval(loader);
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_analysis_failed", {
+                error_type: "timeout",
+                error_message: "Request timed out after 30 seconds",
+                timeout_duration_ms: 30000
+            });
+        }
         showFallbackData();
     }, 30000);
 
@@ -88,6 +107,19 @@ async function loadFutureResults() {
         setText("lifeGPS", extractSection(text, "LIFE_GPS:", "CONFLICT_DETECTOR:"));
         setText("conflictDetector", extractSection(text, "CONFLICT_DETECTOR:", "FUTURE_LETTER:"));
 
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_analysis_generated", {
+                response_length: text.length,
+                has_future_a: text.includes("FUTURE_A:"),
+                has_future_b: text.includes("FUTURE_B:"),
+                has_future_c: text.includes("FUTURE_C:"),
+                has_life_gps: text.includes("LIFE_GPS:"),
+                has_conflict_detector: text.includes("CONFLICT_DETECTOR:"),
+                has_future_letter: text.includes("FUTURE_LETTER:"),
+                generation_duration_ms: Date.now() - generationStart
+            });
+        }
+
         // MEMORY CARDS FIXED
         const memoryContainer = document.getElementById("memoryCards");
         if (memoryContainer) {
@@ -103,6 +135,13 @@ async function loadFutureResults() {
     } catch (err) {
         console.error(err);
         clearInterval(loader);
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_analysis_failed", {
+                error_type: "api_error",
+                error_message: String(err.message || "").substring(0, 100),
+                timeout_duration_ms: Date.now() - generationStart
+            });
+        }
         showFallbackData();
     }
 }
@@ -174,6 +213,15 @@ function speakText(id) {
     speech.volume = 1;
 
     window.speechSynthesis.speak(speech);
+
+    if (typeof pendo !== "undefined") {
+        pendo.track("text_to_speech_used", {
+            section_id: id,
+            voice_choice: selected,
+            text_length: text.length,
+            page: window.location.pathname
+        });
+    }
 }
 
 function stopSpeech() {
@@ -242,14 +290,30 @@ if (window.location.pathname.includes("future-letter.html")) {
 
         if (!full) {
             el.innerText = "No letter found. Please generate first.";
+            if (typeof pendo !== "undefined") {
+                pendo.track("future_letter_viewed", {
+                    letter_length: 0,
+                    has_letter_content: false,
+                    letter_source: "none"
+                });
+            }
             return;
         }
 
         const start = full.indexOf("FUTURE_LETTER:");
-        const letter = start !== -1
+        const hasLetterContent = start !== -1;
+        const letter = hasLetterContent
             ? full.substring(start + "FUTURE_LETTER:".length).trim()
             : "Your future self believes in you.";
 
         el.innerText = letter;
+
+        if (typeof pendo !== "undefined") {
+            pendo.track("future_letter_viewed", {
+                letter_length: letter.length,
+                has_letter_content: hasLetterContent,
+                letter_source: hasLetterContent ? "ai_generated" : "fallback"
+            });
+        }
     });
 }
